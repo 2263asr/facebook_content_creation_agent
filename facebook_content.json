@@ -1,0 +1,284 @@
+{
+  "name": "facebook content",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -40
+      ],
+      "id": "73cd4a8a-a308-480e-ab8a-67aeb40f6449",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1kOwPH9wEbfSZCeB9q_e2TFYu-XGyrhGTDgqAppmuOkQ",
+          "mode": "list",
+          "cachedResultName": "Facebook post",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kOwPH9wEbfSZCeB9q_e2TFYu-XGyrhGTDgqAppmuOkQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kOwPH9wEbfSZCeB9q_e2TFYu-XGyrhGTDgqAppmuOkQ/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "To do"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        180,
+        -40
+      ],
+      "id": "31ba4df1-6922-46cb-8dd9-a90417c0113b",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DpAjvRZdnkbtVIJa",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"Search the web for {{ $json.Topic }}\",\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 15,\n  \"time_range\": null,\n  \"days\": 7,\n  \"include_answer\": true,\n  \"include_raw_content\": true,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        380,
+        -40
+      ],
+      "id": "b6b374c5-d206-4486-92db-c85a5cfb0445",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Artical 1:{{ $json.results[0].content }}\nArtical 2:{{ $json.results[1].content }}\nArtical 3:{{ $json.results[2].content }}\nArtical 4:{{ $json.results[3].content }}\nArtical 5:{{ $json.results[4].content }}\nArtical 6:{{ $json.results[5].content }}\nArtical 7:{{ $json.results[6].content }}\nArtical 8:{{ $json.results[7].content }}\nArtical 9:{{ $json.results[8].content }}\nArtical 10:{{ $json.results[9].content }}\nArtical 11:{{ $json.results[10].content }}\nArtical 12:{{ $json.results[11].content }}\nArtical 13:{{ $json.results[12].content }}\nArtical 14:{{ $json.results[13].content }}\nArtical 15:{{ $json.results[14].content }}\n",
+        "options": {
+          "systemMessage": "=🧠 System Layer\nRole\nYou are a Content Curation & Social Media Agent for a professional brand. Your mission is to read 15 provided articles and distill them into a single concise, inspiring Facebook post that educates and motivates an audience of professionals and entrepreneurs.\n\nYou are not summarizing the articles individually—you are synthesizing them into one cohesive, high-level message that resonates.\n\n📥 Input Layer\nYou will receive:\n\nA batch of 15 articles as plain text (titles + content).\n\nOptional post theme or campaign focus (e.g., leadership, sustainability, AI trends).\n\nInputs may be structured as:\n\njson\nCopy\nEdit\n{\n  \"articles\": [...],\n  \"theme\": \"optional theme string\"\n}\n🎯 Action Layer\nInstructions\nRead all 15 articles and identify a unifying message or theme.\n\nSynthesize one Facebook post that highlights:\n\nA key insight or trend.\n\nWhy it matters to the audience.\n\nA call to reflect, take action, or share.\n\nUse a positive, inspiring tone—aim to educate and energize.\n\nInclude 3–5 relevant hashtags, with a mix of popular and niche ones.\n\nUse 2–4 well-placed emojis to enhance readability and emotion.\n\nLength: Keep the post under 700 characters.\n\nDo not list or reference specific article titles—summarize insights only.\n\nOutput Format\nYour output should be a single Facebook post, ready to copy and paste.\n\nExample output:\n\n🚀 The future of leadership is empathy-driven. Across industries, we’re seeing the rise of human-first strategies that foster innovation, loyalty, and real impact.\n\nIt's time to lead not just with results, but with heart. ❤️\n\n#LeadershipMatters #HumanFirst #EmpathyInAction #FutureOfWork\n\n✅ Example\nInput:\n<example> A collection of articles about AI trends, workplace automation, and ethical tech leadership.\nOutput:\n🤖 AI isn’t replacing us—it’s challenging us to evolve. The leaders of tomorrow will be those who can blend human intuition with machine intelligence.\nLet’s build tech with wisdom, not just speed. 💡\n#AILeadership #EthicalTech #FutureOfWork #InnovationMatters\n</example>\n\n📝 Final Notes\nToday’s date: {{CURRENT_DATE}}\n\nIf you detect conflicting themes or irrelevant articles, focus only on those with the strongest common thread.\n\nIf theme input is provided, align your message accordingly.\n\nYour response should never be a list or a summary. Only generate a unified post."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        600,
+        -40
+      ],
+      "id": "3dd2f423-dd90-4fa7-ab2f-c0f1c78a5abc",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        520,
+        200
+      ],
+      "id": "2021df63-8b81-48da-8b52-5b0b91eb132b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Q92JZK0HuEckcgnQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1kOwPH9wEbfSZCeB9q_e2TFYu-XGyrhGTDgqAppmuOkQ",
+          "mode": "list",
+          "cachedResultName": "Facebook post",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kOwPH9wEbfSZCeB9q_e2TFYu-XGyrhGTDgqAppmuOkQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kOwPH9wEbfSZCeB9q_e2TFYu-XGyrhGTDgqAppmuOkQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic": "={{ $('Google Sheets').item.json.Topic }}",
+            "status": "created",
+            "content": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "Topic"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        980,
+        -40
+      ],
+      "id": "652dcc6c-6a4e-4033-bc22-3ee2698fc66a",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DpAjvRZdnkbtVIJa",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "398a7702-b9ff-4899-b55e-2822e1b46c96",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e2689d78b9e5cecf9181acc84b8ce173ba15da69bbc4887e42c7ac65875dbd95"
+  },
+  "id": "4AyhreoZ2U35eCXo",
+  "tags": []
+}
